@@ -1,6 +1,6 @@
 # What is Dash? 
 
-![](.Dash_images/4503d985.png)
+![](.Dash_images/5d519c29.png)  
 
 ## Overview 
 
