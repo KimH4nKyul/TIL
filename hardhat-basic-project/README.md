@@ -20,6 +20,7 @@ npx hardhat help
 
 1. 이더리움 DApp 개발 도구
 2. Web3.js 대신 Ethers.js 사용
+    * Plugin 형태로 web3.js를 설치해 사용할 수 있음   
 3. in-process 가상 이더리움 네트워크 제공
 4. console.log() 사용 가능  
     * 테스트 용도, 배포시 삭제  
