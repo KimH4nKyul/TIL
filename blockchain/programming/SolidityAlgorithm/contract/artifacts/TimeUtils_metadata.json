@@ -1,0 +1,59 @@
+{
+	"compiler": {
+		"version": "0.8.0+commit.c7dfd78e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"name": "claim",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "timePayout",
+				"outputs": [],
+				"stateMutability": "payable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"Documents/TIL/TIL-2022/blockchain/programming/SolidityAlgorithm/contract/utils.sol": "TimeUtils"
+		},
+		"evmVersion": "istanbul",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"Documents/TIL/TIL-2022/blockchain/programming/SolidityAlgorithm/contract/utils.sol": {
+			"keccak256": "0xfab5f92e16aba2a57e6bea2325e6b72e880af20d809a0d6846859da03613696d",
+			"urls": [
+				"bzz-raw://6cecfe238cc3491f9f57a702f0ca36391d3420b9f4b0d16e032ef65166288dbe",
+				"dweb:/ipfs/QmedThjafuNbgDNCaw1yykM2VPg8qxn6EwXX9Y19xDv9cu"
+			]
+		}
+	},
+	"version": 1
+}
