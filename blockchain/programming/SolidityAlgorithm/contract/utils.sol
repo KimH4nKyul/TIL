@@ -36,6 +36,4 @@ contract TimeUtils {
         }
     }
 }
-// selfdestruct(address recipient):
-// 현재 컨트랙트와 관련된 모든 데이터를 상태 트리에서 제거,
-// 컨트랙트에 남은 이더, this.balance를 recipient에 송금
+
