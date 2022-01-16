@@ -1,3 +1,4 @@
+//SPDX-License-Identifier: UNLICENSED
 // 나쁜 코드의 예시! (사용 금지, 참고용)
 /**
 여러 개를 전송하거나 다른 상태 업데이트를 수행하는 경우,
