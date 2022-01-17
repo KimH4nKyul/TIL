@@ -388,11 +388,108 @@ DAO 해킹은 복잡한 재진입 공격이었다.
 ```solidity
 // splitDAO 함수의 마지막 부분
     Transfer(msg.sender, 0, balances[msg.sender]);
-    withdrawRewardFor(msg.sender);
+    withdrawRewardFor(msg.sender); // 취약!
     totalSupply = totalSupply - balances[msg.sender];
-    balances[msg.sender] = 0;
+    balances[msg.sender] = 0; // 취약!
     paidOut[msg.sender] = 0;
     return true; 
 }
+
+function payOut(address _recipient, uint _amount) public returns (bool){
+    if(msg.sender != owner || msg.value > 0 || (payOwnerOnly && _recipient != owner)) {
+        throw;
+    }
+    if(_recipient.call.value(_amount)()) { // 외부 호출 발생
+        PayOut(_recipient, _amount);
+        return true;
+    } else {
+        return false;
+    }
+}
 ```
+
+withdrawRewardFor() 함수는 이더를 외부 주소로 보내는 payOut() 함수를 호출한다.  
+
+안전하지 않은 `address.call.value()` 함수를 사용해 이더를 보내면서 한도 없이 가스를 사용하므로, 공격자는 폴백 함수를 가진 컨트랙트를 배포해서 withdraw 루프를 반복하고 컨트랙트의 잔고를 빼낼 수 있다.  
+
+이 경우, 수신자 컨트랙트가 DAO의 하위 컨트랙트여야 한다는 제약이 있었다. 내부 규정으로 인해 자금은 사용되기 전에 7일간 잠겼다.  
+
+```solidity
+// 자금의 최소 잠근 기간
+uint constant minSplitDebatePeriod = 1 weeks;
+```
+
+이 7일이라는 유지 기간 덕택에 하드 포크의 안전한 실행이 가능했다. 공격자가 자금을 즉시 인출할 수 있었다면 자금을 거래소로 옮겨서 매도했을 것이고 해킹을 롤백하는것은 불가능했을 것이다. 왜냐하면 이더를 보유한 일반인들도 롤백의 영향을 받게 되기 때문이다. 
+
+## 패리티 멀티 시그 해킹 사건  
+
+패리티 멀티 시그 지갑은 패리티 소프트웨어에 내장된 스마트 컨트랙트로, 컨트랙트의 자금을 인출하기 위해서 여러 개의 키를 사용해야만 했다. 많은 ICO 벤처 기업이 자금을 안전하게 유지하기 위해 이 기능을 사용하고 있었다.  
+
+하지만 이 멀티시그 지갑은 여러 컨트랙트에 걸쳐 총 15만 이더를 잃게 만든 치명적인 폴백 함수를 갖고 있었다.  
+
+범인은 일반인이 접근할 수 없었던 라이브러리 함수였다.  
+
+```solidity
+// 패리티 멀티 시그 지갑 취약점
+function initWallet(address[] _owners, uint _required, uint _daylimit) {
+    initDaylimit(_daylimit);
+    initMultiowned(_owners, _required);
+}
+```
+
+이 함수는 소유자가 여럿인 멀티시그 지갑을 초기화한다.  
+이는 컨트랙트를 초기화할 때만 호출돼야 하는 함수이다.  
+이 함수에 접근할 수 있는 주체는 컨트랙트를 리셋하고 새 소유자를 선언할 수 있다.  
+라이브러리 함수는 대게 ABI를 통해 접근할 수 없지만 이 컨트랙트는 선언되지 않은 함수를 실행하기 위해 아래와 같이 위험한 폴백 함수를 포함하고 있었다.  
+
+```solidity
+function () payable {
+    // 현금만 받는 용도?
+    if(msg.value > 0) {
+        Deposit(msg.sender, msg.value);
+    } else if(msg.data.length > 0) {
+        _walletLibrary.delegatecall(msg.data);
+    }
+}
+```
+
+폴백 함수는 일치하지 않는 함수 이름을 호출할 때 실행된다.  
+delegatecall() 함수는 함수 호출을 다른 라이브러리 또는 컨트랙트로 전달하는 데 사용할 수 있다.  
+이 경우 일치하지 않는 initWallet() 함수가 포함된 라이브러리로 전달됐다. 공격자는 그 기능을 호출해 자신을 소유자로 만들고 자금을 인출할 수 있었다.  
+
+이러한 사태를 방지하는 방법은 간단하다.  
+delegatecall() 함수를 절대로 사용하지 않는 것이다.  
+이 함수는 위험하며 보안 구멍을 쉽게 노출시킨다.  
+*<u>전달할 함수를 명시적으로 기술하는 편이 낫다.</u>*
+
+## 코인 대시 해킹 사건
+
+코인대시 해킹은 스마트 컨트랙트 취약점이 아닌 웹 취약점 해킹이었다.  
+코인대시의 ICO가 진행되는 동안 공격자는 코인대시 ICO의 이더리움 주소를 자신의 주소로 대체했다.  
+이로 인해 투자자들은 코인대시 ICO 컨트랙트 대신 공격자의 주소로 30000 이더를 보냈다.  
+
+## 거번멘털 버그 사건  
+
+커번멘털 컨트랙트는 해킹이 아닌 버그로 인한 사고였다.  
+그 버그로 수 개월간 컨트랙트의 상금 배분이 어려워졌던 일이다.  
+거번멘털은 일종의 피라미드 컨트랙트이다. 피라미드 컨트랙트의 기본은 한 명의 플레이어가 큰 상을 가져갈 수 있다는 의미이다. 거번멘털의 잔고를 지급하는 코드는 다음과 같다.  
+
+```solidity
+// 거번멘털의 이더 지급 코드
+// 마지막 채권자에게 모든 컨트랙트 자금 전송
+creditorAddresses[creditorAddresses.length - 1].send(profitFromCrash);
+corruptElite.send(this.balance);
+
+//컨트랙트 상태 초기화
+lastCreditorPayedOut = 0;
+lastTimeOfNewCredit = block.timestamp;
+profitFromCrash = 0;
+creditorAddresses = new address[](0); // 버그
+creditorAmounts = new uint[](0); // 버그
+round += 1;
+return false; 
+```
+
+`// 버그` 표시된 두 줄은 상태 트리에서 상당한 규모의 저장소를 업데이트해야 한다.  
+수백 명이 게임에 참여했기 때문에 수백 개의 주소와 잔고를 0으로 설정해야 했던 것이다. <u>*이 트랜잭션에 대한 가스 요금은 당시의 블록 가스 한도가 증가할 때까지 기다린 후에야 상금을 수취할 수 있었다.*</u>
 
