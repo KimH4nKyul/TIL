@@ -22,7 +22,7 @@ contract SimplePonzi {
         currentInvestment = msg.value; // 투자금 정보와 함께!
 
         // payout previous investor
-        previousInvestor.send(msg.value); // 그리고 이전의 투자자에게 투자금을 지급한다.
+        previousInvestor.transfer(msg.value); // 그리고 이전의 투자자에게 투자금을 지급한다.
     }
 }
 
@@ -57,39 +57,46 @@ contract GradualPonzi {
     }
 }
 
+/**
+점점 더 커지는 피라미드를 형성하면서 참가자들에게 수익금을 지불해야 한다.
+각 단계는 전 단계보다 두 배 크며, 각 단계는 다음 단계가 채워지면 투자금을 회수한다.
+ */
 contract SimplePyramid {
     uint256 public constant MINIMUM_INVESTMENT = 1e15; // 0.001 ether
-    uint256 public numInvestors = 0;
+    uint256 public numInvestors = 0; // numInvestors가 충분히 클 경우 동작하지 않을 수도 있다. (블록 가스 한도)
     uint256 public depth = 0;
     address[] public investors;
     mapping(address => uint256) public balances;
     uint256 public investorsLength = 3;
 
     constructor() payable {
+        // 첫번째 투자자는 컨트랙트 작성자이다.
         require(msg.value >= MINIMUM_INVESTMENT);
         // investors.length = 3;
         // investors[0] = msg.sender;
         investors.push(msg.sender);
         numInvestors = 1;
-        depth = 1;
+        depth = 1; // 현재 피라미드 단계, 각 단계의 투자자 수는 depth의 2제곱(depth ** 2)
         balances[address(this)] = msg.value;
     }
 
     fallback() external payable {
-        require(msg.value >= MINIMUM_INVESTMENT);
-        balances[address(this)] += msg.value;
+        require(msg.value >= MINIMUM_INVESTMENT); // 투자가 들어오면
+        balances[address(this)] += msg.value; // 이 컨트랙트 주소의 잔고를 업데이트하고
 
-        numInvestors += 1;
-        investors[numInvestors - 1] = msg.sender;
+        numInvestors += 1; // 투자자 수를 증가시칸다.
+        investors[numInvestors - 1] = msg.sender; // 그리고 투자자 주소를 담는다.
 
         if (numInvestors == investorsLength) {
             // pay out previous layer
+            // 이전 단계 투자자 지급
             uint256 endIndex = numInvestors - 2**depth;
             uint256 startIndex = endIndex - 2**(depth - 1);
             for (uint256 i = startIndex; i < endIndex; i++)
                 balances[investors[i]] += MINIMUM_INVESTMENT;
 
             // spread remaining ether among all participants
+            // 남은 이더를 전체 참여자에게 분배
             uint256 paid = MINIMUM_INVESTMENT * 2**(depth - 1);
             uint256 eachInvestorGets = (balances[address(this)] - paid) /
                 numInvestors;
@@ -105,6 +112,7 @@ contract SimplePyramid {
     }
 
     function withdraw() public {
+        // 호출자의 모든 잔액을 인출한다.
         uint256 payout = balances[msg.sender];
         balances[msg.sender] = 0;
         payable(msg.sender).transfer(payout);
