@@ -53,4 +53,4 @@ DataURL을 File Buffer로 변환해 IPFS에 추가해야 하는 상황이 있었
     reader.onloadend = () => {
         console.log(reader.result);
     }
-* ```
+  ```
