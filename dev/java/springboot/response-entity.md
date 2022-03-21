@@ -65,7 +65,6 @@ public void delete(@RequestParam String name, @PathVariable(required = false) St
 ## @RequestBody 어노테이션
 
 - POST 메소드로 넘어온 JSON 데이터를 캐치
-
 ```java
 @RequestBody UserDTO userDto
 ```
@@ -86,11 +85,24 @@ public void delete(@RequestParam String name, @PathVariable(required = false) St
 
 ## ResponseEntity<E> 는 뭘까?
 
+- `HttpEntity` 클래스를 상속받아 구현한 클래스 
+- `HttpEntity` 클래스는 `HttpHeader` , `HttpBody` 를 포함하는 클래스이다.  
+    
+    ```java
+    public class HttpEntity<T> {
+        private final HttpHeaders headers;
+        
+        @Nullable
+        private final T body;
+    }
+    ```
+
 - **개발자가 직접 HTTP의 body, headers, status code를 제어하도록 한다.**
 - Client의 요청에 대한 응답을 한 번 더 감싸서 
 - 처리 동작을 추가할 수 있게 해주거나, View가 아닌 HTTP 정보만을 반환해야 할 때 사용하는 객체이다.
     - 예를 들어, 응답의 상태코드에 따라 다른 결과 화면을 노출
     - Header값에 따라 다른 동작을 하게 하기 등등..
+    - `HttpStatus`, `HttpHeaders`, `HttpBody` 를 포함한다.
 
 ```java
 @PutMapping("/put201")
