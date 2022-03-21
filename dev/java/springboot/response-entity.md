@@ -112,5 +112,5 @@ public void test2(Model model) throws JsonProcessingException {
 - 아래는 좀 더 도움이 되는 설명 
     - REST API란? https://meetup.toast.com/posts/92
     - ResponseEntitiy란? https://devlog-wjdrbs96.tistory.com/182
-    <img src="./img/reference_responseentity.jpeg" width="50%" height="50%"/>
-    <img src="./img/reference_responseentity2.jpeg" width="50%" height="50%"/>
+    <img src="../images/reference_responseentity.jpeg" width="60%" height="50%"/>
+    <img src="../images/reference_responseentity2.jpeg" width="60%" height="50%"/>
