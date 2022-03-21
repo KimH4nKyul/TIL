@@ -70,6 +70,20 @@ public void delete(@RequestParam String name, @PathVariable(required = false) St
 @RequestBody UserDTO userDto
 ```
 
+## @ResponseBody 어노테이션
+
+- 클라이언트 요청에 대해 서버에서 응답을 자바 객체를 `HTTP Response Body` 에 써서 준다.
+- 쓰여지기 전에 `MessageConverter` 에서 변환이 이루어진다. 
+    - `StringHttpMessageConverter`
+    - `FormHttpMessageConverter`
+    - `ByteArrayMessageConverter`
+    - `MarshallingHttpMessageConverter`
+    - `MappingJacksonHttpMessageConverter`
+    - `SourceHttpMessageConverter`
+    - `BufferedImagedHttpMessageConverter`
+- `SpringBoot` 에서는 `Content-Type` 을 참고해서 Converter를 자동 선택해 사용한다.
+- `@RestController`를 사용하면 `@ResponseBody` 생략 가능하다. 
+
 ## ResponseEntity<E> 는 뭘까?
 
 - **개발자가 직접 HTTP의 body, headers, status code를 제어하도록 한다.**
