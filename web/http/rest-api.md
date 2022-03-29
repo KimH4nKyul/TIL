@@ -54,7 +54,7 @@ REST API는 위에서 소개 하였듯이,
     
 # URI 설계 시 주의점
 
-* 슬래시 구분자(`/`)는 계층 관계를 나타낸다.
+* 슬래시 구분자(`/`)는 계층 관계를 나타낸다.  
   ```
   http://hankyul.com/houses/apartments
   http://hankyul.com/animals/mammals/whales
@@ -72,11 +72,23 @@ REST API는 위에서 소개 하였듯이,
 
 * URI 경로는 <b>소문자</b>로 표현한다.
   * 대소문자에 따라 다른 자원으로 인식한다.
-  * `RFC3986`에서 URI 스키마와 호스트를 제외하고 대소문자를 구별하도록 규정되어 있다.
+  * `RFC3986`에서 URI 스키마와 호스트를 제외하고 대소문자를 구별하도록 규정되어 있다.  
     `RFC 3986 is the URI (Unified Resource Identifier) Syntax document`
     
-* 파일 확장자는 URI에 포함시키지 않는다.
-  * `http://hankyul.com/members/soccer/345/photo.png` 는 URI의 잘못된 표현이다. 
-  * 확장자를 포함시켜야 할 때는 `Accept Header`를 사용토록 한다.
+* 파일 확장자는 URI에 포함시키지 않는다.  
+  * `http://hankyul.com/members/soccer/345/photo.png` 는 URI의 잘못된 표현이다.   
+  * 확장자를 포함시켜야 할 때는 `Accept Header`를 사용토록 한다.  
     `GET / members/soccer/345/photo HTTP/1.1 Host: hankyul.com Accept: image/png`
     
+# 리소스 간의 관계를 표현하는 방법
+
+* <b>연관관계</b>로 표현한다.   
+
+* /리소스명/리소스 ID/관계가 있는 다른 리소스명    
+ `/users/{userid}/devices` (소유 'has'의 관계로 표현)
+ 
+* 관계명이 복잡하다면 서브 리소스에 명시적 표현한다.   
+  `/users/{userid}/likes/devices`
+  
+# 자원을 표현하는 `Collection` 과 `Document`
+
