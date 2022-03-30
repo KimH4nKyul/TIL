@@ -92,3 +92,8 @@ REST API는 위에서 소개 하였듯이,
   
 # 자원을 표현하는 `Collection` 과 `Document`
 
+* `Document`
+ * 하나의 객체
+* `Collection`
+ * 객체들의 집합
+  `http://`
