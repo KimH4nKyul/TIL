@@ -1,0 +1,56 @@
+# 자바스크립트에서 시간을 10분 단위로 변경해주는 코드 작성
+
+## 스토리
+> 주마다 돌아야 하는 스케줄러는 10분 단위로 예약 시간을 체크하기 때문에  
+> 그 값도 10분 단위로 저장되어 있어야 한다. 
+> 하드코딩이지만 해당하는 로직을 자바스크립트로 하드코딩 해보았다. 
+
+## 입력  
+
+`2022-05-19 17:00`  
+`2022-05-19 17:01`  
+`2022-05-19 23:55`  
+
+## 출력
+
+`2022-05-19 17:00`  
+`2022-05-19 17:10`  
+`2022-05-20 00:00`  
+
+## 코드
+
+```javascript
+const changeTime = (time) => {
+  const fillZero = (n) => {
+    return (n < 10 ? "0": "") + n;
+  };
+  
+  let timeObj = new Date(time);
+  let splitTime = time.split(" ");
+  let temp = splitTime[1];
+  
+  splitTime = splitTime.split(":", 2);
+  let minute = splitTime[1];
+  
+  let m_suffix = '';
+  let m_prefix = '';
+  if(minute.endsWith("0")) {
+    return time;
+  } else { 
+    m_suffix = parseInt(minute[0]) + 1;
+    if(5 < m_suffix) {
+      m_suffix = 0;
+      timeObj.setHours(timeObj.getHours() + 1);
+    }
+    m_prefix = minute[1].replace(/^[1-9]*$/, "0");
+    
+    const newMinute = String(m_suffix) + m_prefix;
+    const fullYear = fillZero(timeObj.getFullYear());
+    const month = fillZero(timeObj.getMonth() + 1);
+    const date = fillZero(timeObj.getDate());
+    const hours = fillZero(timeObj.getHours());
+    
+    return (fullYear + "-" + month + "-" + date + " " + hours + ":" + newMinute);
+  }
+};
+```
