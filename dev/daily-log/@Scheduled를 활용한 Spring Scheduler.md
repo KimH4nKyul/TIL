@@ -91,6 +91,18 @@ public void cronScheduler() {
 그렇기 때문에 스케줄러를 비동기적으로 실행해 PUSH를 보장할 수 있어야 합니다. 
 `@Async` 를 활용하면 다음 스케줄러가 이전 스케줄러의 작업이 끝날때 까지 기다리지 않고 자신의 작업을 처리할 수 있게 될겁니다. 
 
+> `@Async` 를 사용하기 전에 `@EnableAsync` 로 활성화 시켜 주어야 합니다. 
+  ```java
+  @SpringBootApplication
+  @EnableScheduling
+  @EnableAsync            // Async 활성화 
+  public class MySchedulerApplication {
+    public void main(String[] args) {
+      SpringApplication.run(MySchedulerApplication.class, args); 
+    }
+  }
+  ```
+
 ### 코드 
 
 ```java
