@@ -7,6 +7,32 @@
 
 ## @Scheduled 애노테이션? 
 
+Spring Scheduler는 `@Scheduled` 애노테이션을 명시해 사용할 수 있습니다.  
+보통 실행하고자 하는 메소드명 위에 명시해 놓는데요.  
+Scheduler가 정상 작동하기 위해서는 우선 스프링 애플리케이션에서 Scheduling을 활성화 시켜줄 필요가 있습니다. 😅  
+  
+### Scheduling을 활성화 시키는 방법
+
+Scheduling은 `@EnableScheduling` 애노테이션을 클래스 위에 명시해 활성화 시킵니다.  
+이 때, `@Scheduled` 를 사용하고자 원하는 클래스 위에 명시할 수도 있고, `@SpringBootApplcation` 이 위치한 클래스 위에 명시해도 됩니다.  
+
+```java
+@EnableScheduling
+public class MySchedulerClass {
+  @Scheduled(cron="0/60 * * * * ?")
+}
+```
+또는  
+```java
+@SpringBootApplication
+@EnableScheduling
+public class MySchedulerApplication { 
+  public static void main(String[] args) {
+    SpringApplication.run(MySchedulerApplication.class, args);
+  }
+}
+```
+
 ## @Async는 왜 필요했나?
 
 ## Configuration 만들기 
